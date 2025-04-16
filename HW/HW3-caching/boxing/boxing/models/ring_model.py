@@ -31,7 +31,10 @@ class RingModel:
             ttl_seconds (int): The time-to-live in seconds for the cached boxer objects.
 
         """
-        pass
+        self._boxer_cache: dict[int, Boxers] = {}
+        self._ttl: dict[int, float] = {}
+        self.ttl_seconds = int(os.getenv("TTL", 60))  # Default TTL is 60 seconds
+
 
     def fight(self) -> str:
         """Simulates a fight between two combatants.
@@ -135,15 +138,26 @@ class RingModel:
             logger.warning("Retrieving boxers from an empty ring.")
         else:
             logger.info(f"Retrieving {len(self.ring)} boxers from the ring.")
-
+        
+        boxers = []
         for boxer_id in self.ring:
-            if expired:
-                logger.info(f"TTL expired or missing for boxer {boxer_id}. Refreshing from DB.")
-            else:
-                logger.debug(f"Using cached boxer {boxer_id} (TTL valid).")
+            now = time.time()
+            if boxer_id in self._boxer_cache and self._ttl.get(boxer_id, 0) > now:
+                logger.debug(f"Boxer ID {boxer_id} retrieved from cache")
+                boxers.append(self._boxer_cache[boxer_id])
+            try:
+                boxer = Boxers.get_boxer_by_id(boxer_id)
+                logger.info(f"Boxer ID {boxer_id} loaded from DB")
+                self._boxer_cache[boxer_id] = boxer
+                self._ttl[boxer_id] = now + self.ttl_seconds
+                boxers.append(boxer)
+            except ValueError as e:
+                logger.error(f"Boxer ID {boxer_id} not found in DB: {e}")
+                raise ValueError(f"Boxer ID {boxer_id} not found in database") from e
 
         logger.info(f"Retrieved {len(boxers)} boxers from the ring.")
-
+        
+        return boxers
     def get_fighting_skill(self, boxer: Boxers) -> float:
         """Calculates the fighting skill for a boxer based on arbitrary rules.
 
