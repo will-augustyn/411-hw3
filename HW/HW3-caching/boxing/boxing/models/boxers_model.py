@@ -21,6 +21,10 @@ class Boxers(db.Model):
 
     """
 
+    __tablename__ = "boxers"
+
+    
+
     def __init__(self, name: str, weight: float, height: float, reach: float, age: int):
         """Initialize a new Boxer instance with basic attributes.
 
