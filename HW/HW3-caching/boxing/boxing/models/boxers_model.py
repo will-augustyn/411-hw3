@@ -200,9 +200,12 @@ class Boxers(db.Model):
             ValueError: If the boxer with the given name does not exist.
 
         """
-        if boxer is None:
+        boxer = cls.query.filter_by(name=name).first()
+        if not boxer:
             logger.info(f"Boxer '{name}' not found.")
-        pass
+            raise ValueError(f"Boxer with name '{name}' does not exist.")
+        
+        return boxer
 
     @classmethod
     def delete(cls, boxer_id: int) -> None:
