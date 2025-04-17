@@ -79,9 +79,6 @@ class Boxers(db.Model):
         Raises:
             ValueError: If the weight is less than 125.
         """
-
-        if weight < 125:
-            raise ValueError("Boxer's weight must be larger than 125")
         
         if weight < 125:
             raise ValueError("Boxer's weight must be larger than 125")
