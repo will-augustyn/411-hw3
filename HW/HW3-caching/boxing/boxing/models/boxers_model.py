@@ -34,8 +34,6 @@ class Boxers(db.Model):
     wins = db.Column(db.Integer, nullable=False, default=0)
     weight_class = db.Column(db.String)
 
-
-
     def __init__(self, name: str, weight: float, height: float, reach: float, age: int):
         """Initialize a new Boxer instance with basic attributes.
 
@@ -50,7 +48,26 @@ class Boxers(db.Model):
             - The boxer's weight class is automatically assigned based on weight.
             - Fight statistics (`fights` and `wins`) are initialized to 0 by default in the database schema.
 
+        Raises:
+            ValueError: If any required fields are invalid
+
         """
+
+        existing = Boxers.query.filter_by(name=name).first()
+        if existing:
+            raise ValueError(f"Boxer with name '{name}' already exists.")
+
+        if not self.name or not isinstance(self.name, str):
+            raise ValueError("Boxer must be a non-empty string.")
+        if not isinstance(self.weight, float) or self.weight < 125:
+            raise ValueError("Weight must be a float and at least 125.")
+        if not isinstance(self.height, float) or self.height <= 0:
+            raise ValueError("Height must be a float and greater than 0.")
+        if not isinstance(self.reach, float) or self.reach <= 0:
+            raise ValueError("Reach must be an float and greater than 0.")
+        if not isinstance(self.age, int) or self.age < 18 or self.age > 40:
+            raise ValueError("Age must be an integer and between 18 and 40.")
+        
         self.name = name 
         self.weight = weight
         self.height = height
@@ -85,11 +102,11 @@ class Boxers(db.Model):
 
         if weight < 135:
             return "Lightweight"
-        elif weight < 147:
+        elif 135 < weight < 147:
             return "Welterweight"
-        elif weight < 160:
+        elif 147 < weight < 160:
             return "Middleweight"
-        elif weight < 175:
+        elif 160 < weight < 175:
             return "Light Heavyweight"
         else:
             return "Heavyweight"
@@ -113,13 +130,30 @@ class Boxers(db.Model):
         """
         logger.info(f"Creating boxer: {name}, {weight=} {height=} {reach=} {age=}")
 
+        if weight < 125:
+            raise ValueError("Boxer's weight must be larger than 125")
+
         try:
+            boxer = Boxers(
+                name=name.strip(),
+                weight=weight,
+                height=height, 
+                reach=reach,
+                age=age
+            )
+            
+            db.session.add(boxer)
+            db.session.commit()
             logger.info(f"Boxer created successfully: {name}")
+
         except IntegrityError:
             logger.error(f"Boxer with name '{name}' already exists.")
-        except SQLAlchemyError as e:
             db.session.rollback()
+            raise ValueError(f"The name '{name}' already exist in the data")
+        except SQLAlchemyError as e:
             logger.error(f"Database error during creation: {e}")
+            db.session.rollback()
+            raise
 
     @classmethod
     def get_boxer_by_id(cls, boxer_id: int) -> "Boxers":
