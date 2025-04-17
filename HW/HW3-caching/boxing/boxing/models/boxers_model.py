@@ -57,15 +57,15 @@ class Boxers(db.Model):
         if existing:
             raise ValueError(f"Boxer with name '{name}' already exists.")
 
-        if not self.name or not isinstance(self.name, str):
+        if not name or not isinstance(name, str):
             raise ValueError("Boxer must be a non-empty string.")
-        if not isinstance(self.weight, float) or self.weight < 125:
+        if not isinstance(weight, float) or weight < 125:
             raise ValueError("Weight must be a float and at least 125.")
-        if not isinstance(self.height, float) or self.height <= 0:
+        if not isinstance(height, float) or height <= 0:
             raise ValueError("Height must be a float and greater than 0.")
-        if not isinstance(self.reach, float) or self.reach <= 0:
+        if not isinstance(reach, float) or reach <= 0:
             raise ValueError("Reach must be an float and greater than 0.")
-        if not isinstance(self.age, int) or self.age < 18 or self.age > 40:
+        if not isinstance(age, int) or age < 18 or age > 40:
             raise ValueError("Age must be an integer and between 18 and 40.")
         
         self.name = name 
@@ -169,9 +169,22 @@ class Boxers(db.Model):
             ValueError: If the boxer with the given ID does not exist.
 
         """
-        if boxer is None:
-            logger.info(f"Boxer with ID {boxer_id} not found.")
-        pass
+
+        logger.info(f"Attmepting to retrieve boxer with ID {boxer_id}")
+
+        try:
+            boxer = cls.query.get(boxer_id)
+
+            if not boxer:
+                logger.info(f"Boxer with ID {boxer_id} no found")
+                raise ValueError(f"Boxer with ID {boxer_id} no found")
+            
+            logger.info(f"Successfully retrieved boxer")
+            return boxer
+        
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while retriving boxer by ID {boxer_id}")
+            raise
 
     @classmethod
     def get_boxer_by_name(cls, name: str) -> "Boxers":
