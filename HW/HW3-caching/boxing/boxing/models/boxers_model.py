@@ -34,6 +34,8 @@ class Boxers(db.Model):
     wins = db.Column(db.Integer, nullable=False, default=0)
     weight_class = db.Column(db.String)
 
+
+
     def __init__(self, name: str, weight: float, height: float, reach: float, age: int):
         """Initialize a new Boxer instance with basic attributes.
 
@@ -54,6 +56,8 @@ class Boxers(db.Model):
         self.height = height
         self.reach = reach
         self.age = age
+
+
         
 
     @classmethod
@@ -74,9 +78,24 @@ class Boxers(db.Model):
 
         Raises:
             ValueError: If the weight is less than 125.
-
         """
-        pass
+
+        if weight < 125:
+            raise ValueError("Boxer's weight must be larger than 125")
+        
+        if weight < 125:
+            raise ValueError("Boxer's weight must be larger than 125")
+
+        if weight < 135:
+            return "Lightweight"
+        elif weight < 147:
+            return "Welterweight"
+        elif weight < 160:
+            return "Middleweight"
+        elif weight < 175:
+            return "Light Heavyweight"
+        else:
+            return "Heavyweight"
 
     @classmethod
     def create_boxer(cls, name: str, weight: float, height: float, reach: float, age: int) -> None:
