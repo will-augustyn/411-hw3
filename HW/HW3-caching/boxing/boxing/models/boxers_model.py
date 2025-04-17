@@ -69,9 +69,9 @@ class Boxers(db.Model):
             raise ValueError("Age must be an integer and between 18 and 40.")
         
         self.name = name 
-        self.weight = weight
-        self.height = height
-        self.reach = reach
+        self.weight = float(weight)
+        self.height = float(height)
+        self.reach = float(reach)
         self.age = age
 
 
