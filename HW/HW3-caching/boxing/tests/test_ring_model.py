@@ -18,9 +18,9 @@ def ring_model():
 def sample_boxer1(session):
     boxer = Boxers(
         name="Muhammad Ali",
-        weight=210,
-        height=191,
-        reach=78,
+        weight=210.0,
+        height=191.0,
+        reach=78.0,
         age=32
     )
     # now we need to not only create the boxer but also add it to the database
@@ -33,9 +33,9 @@ def sample_boxer1(session):
 def sample_boxer2(session):
     boxer = Boxers(
         name="Mike Tyson",
-        weight=220,
-        height=178,
-        reach=71,
+        weight=220.0,
+        height=178.0,
+        reach=71.0,
         age=24
     )
     session.add(boxer)
@@ -149,14 +149,14 @@ def test_enter_ring(ring_model, sample_boxers, app):
     assert len(ring_model.ring) == 2, "Ring should contain two boxers after calling enter_ring."
     assert ring_model.ring[1] == 2, "Expected 'Mike Tyson' (id 2) in the ring."
 
-def test_enter_ring_full(ring_model):
+def test_enter_ring_full(ring_model, app, sample_boxers):
     """Test that enter_ring raises an error when the ring is full.
 
     """
     ring_model.ring = [1, 2]
 
     with pytest.raises(ValueError, match="Ring is full"):
-        ring_model.enter_ring(3)
+        ring_model.enter_ring(sample_boxers[1].id)
 
     assert len(ring_model.ring) == 2, "Ring should still contain only 2 boxers after trying to add a third."
 
@@ -171,10 +171,10 @@ def test_get_fighting_skill(ring_model, sample_boxers):
 
     """
     expected_score_1 = (210 * 12) + (78 / 10)  # 210 * 12 + 7.8 = 2527.8
-    assert ring_model.get_fighting_skill(sample_boxers[0]) == expected_score_1, f"Expected score: {expected_score_1}, got {ring_model.get_fighting_skill(boxer_1)}"
+    assert ring_model.get_fighting_skill(sample_boxers[0]) == expected_score_1, f"Expected score: {expected_score_1}, got {ring_model.get_fighting_skill(sample_boxers[0])}"
 
     expected_score_2 = (220 * 10) + (71 / 10) - 1  # 220 * 10 + 7.1 - 1 = 2206.1
-    assert ring_model.get_fighting_skill(sample_boxers[1]) == expected_score_2, f"Expected score: {expected_score_2}, got {ring_model.get_fighting_skill(boxer_2)}"
+    assert ring_model.get_fighting_skill(sample_boxers[1]) == expected_score_2, f"Expected score: {expected_score_2}, got {ring_model.get_fighting_skill(sample_boxers[2])}"
 
 def test_fight(ring_model, sample_boxers, caplog, mocker):
     """Test the fight method with sample boxers.
