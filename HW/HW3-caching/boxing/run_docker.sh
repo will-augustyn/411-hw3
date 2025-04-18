@@ -44,7 +44,7 @@ echo "Running Docker container..."
 docker run -d \
   --name ${IMAGE_NAME}_container \
   --env-file .env \
-  -p ${HOST_PORT}:${CONTAINER_PORT} \
+  -p 5001:5000 \
   ${IMAGE_NAME}:${CONTAINER_TAG}
 
 echo "Docker container is running on port ${HOST_PORT}."

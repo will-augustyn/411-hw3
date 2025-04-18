@@ -2,23 +2,23 @@ import requests
 
 
 def run_smoketest():
-    base_url = "http://localhost:5000/api"
+    base_url = "http://localhost:5001/api"
     username = "test"
     password = "test"
 
     test_muhammad_ali = {
         "name": "Muhammad Ali",
-        "weight": 210,
-        "height": 191,
-        "reach": 78,
+        "weight": 210.0,
+        "height": 191.0,
+        "reach": 78.0,
         "age": 32
     }
 
     test_joe_frazier = {
         "name": "Joe Frazier",
-        "weight": 205,
-        "height": 182,
-        "reach": 73,
+        "weight": 205.0,
+        "height": 182.0,
+        "reach": 73.0,
         "age": 30
     }
 
@@ -56,6 +56,8 @@ def run_smoketest():
     print("Login successful")
 
     create_boxer_resp = session.post(f"{base_url}/add-boxer", json=test_muhammad_ali)
+    print("Status code:", create_boxer_resp.status_code)
+    print("Response JSON:", create_boxer_resp.json())
     assert create_boxer_resp.status_code == 201
     assert create_boxer_resp.json()["status"] == "success"
     print("Boxer creation successful")
@@ -78,6 +80,8 @@ def run_smoketest():
     print("Login with new password successful")
 
     create_boxer_resp = session.post(f"{base_url}/add-boxer", json=test_joe_frazier)
+    print("Status code:", create_boxer_resp.status_code)
+    print("Response JSON:", create_boxer_resp.json())
     assert create_boxer_resp.status_code == 201
     assert create_boxer_resp.json()["status"] == "success"
     print("Boxer creation successful")
