@@ -147,19 +147,20 @@ class RingModel:
             if boxer_id in self._boxer_cache and self._ttl.get(boxer_id, 0) > now:
                 logger.debug(f"Boxer ID {boxer_id} retrieved from cache")
                 boxers.append(self._boxer_cache[boxer_id])
-            try:
-                boxer = Boxers.get_boxer_by_id(boxer_id)
-                logger.info(f"Boxer ID {boxer_id} loaded from DB")
-                self._boxer_cache[boxer_id] = boxer
-                self._ttl[boxer_id] = now + self.ttl_seconds
-                boxers.append(boxer)
-            except ValueError as e:
-                logger.error(f"Boxer ID {boxer_id} not found in DB: {e}")
-                raise ValueError(f"Boxer ID {boxer_id} not found in database") from e
+            else:
+                try:
+                    boxer = Boxers.get_boxer_by_id(boxer_id)
+                    logger.info(f"Boxer ID {boxer_id} loaded from DB")
+                    self._boxer_cache[boxer_id] = boxer
+                    self._ttl[boxer_id] = now + self.ttl_seconds
+                    boxers.append(boxer)
+                except ValueError as e:
+                    logger.error(f"Boxer ID {boxer_id} not found in DB: {e}")
+                    raise ValueError(f"Boxer ID {boxer_id} not found in database") from e
 
         logger.info(f"Retrieved {len(boxers)} boxers from the ring.")
-        
         return boxers
+    
     def get_fighting_skill(self, boxer: Boxers) -> float:
         """Calculates the fighting skill for a boxer based on arbitrary rules.
 
