@@ -18,20 +18,20 @@ def mock_random_org(mocker):
     return mock_response
 
 def test_get_random(mock_random_org, mocker):
-    """Test retrieving a random number from random.org.
+    """Test retrieving a random number from random.org."""
+    # Patch requests.get before get_random is called
+    mocked_get = mocker.patch(
+        "requests.get",
+        return_value=mock_random_org
+    )
 
-    """
+    # Call the function under test
     result = get_random()
 
-    # Assert that the result is the mocked random number
+    # Assert the mocked value is returned
     assert result == RANDOM_NUMBER, f"Expected random number {RANDOM_NUMBER}, but got {result}"
 
-    # # Ensure that the correct URL was called
-    # requests.get.assert_called_once_with("https://www.random.org/decimal-fractions/?num=1&dec=2&col=1&format=plain&rnd=new", timeout=5)
-    
-    mocked_get = mocker.patch("requests.get", return_value=mock_random_org)
-
-    # Now assert it was called as expected
+    # Assert that the correct URL was requested
     mocked_get.assert_called_once_with(
         "https://www.random.org/decimal-fractions/?num=1&dec=2&col=1&format=plain&rnd=new",
         timeout=5
